@@ -1,0 +1,66 @@
+{
+    "name": "ds_CopyStagingSalesToSqlDB",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "SalesSqlDB_ls",
+            "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "AzureSqlTable",
+        "schema": [
+            {
+                "name": "CustomerID",
+                "type": "int",
+                "precision": 10
+            },
+            {
+                "name": "name",
+                "type": "nvarchar"
+            },
+            {
+                "name": "amount",
+                "type": "decimal",
+                "precision": 10,
+                "scale": 2
+            },
+            {
+                "name": "SaleID",
+                "type": "nvarchar"
+            },
+            {
+                "name": "StoreID",
+                "type": "int",
+                "precision": 10
+            },
+            {
+                "name": "Quantity",
+                "type": "int",
+                "precision": 10
+            },
+            {
+                "name": "SaleDate",
+                "type": "date"
+            },
+            {
+                "name": "SaleTimestamp",
+                "type": "datetime2",
+                "scale": 7
+            },
+            {
+                "name": "LoadTimestamp",
+                "type": "datetime2",
+                "scale": 7
+            },
+            {
+                "name": "ProductID",
+                "type": "int",
+                "precision": 10
+            }
+        ],
+        "typeProperties": {
+            "schema": "dbo",
+            "table": "staging_sales"
+        }
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}
