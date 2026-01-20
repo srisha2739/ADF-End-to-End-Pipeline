@@ -1,0 +1,95 @@
+{
+    "name": "df_SalesTransform",
+    "properties": {
+        "type": "MappingDataFlow",
+        "typeProperties": {
+            "sources": [
+                {
+                    "dataset": {
+                        "referenceName": "ds_CopyStagingSalesToSqlDB",
+                        "type": "DatasetReference"
+                    },
+                    "name": "StagingSales"
+                }
+            ],
+            "sinks": [
+                {
+                    "dataset": {
+                        "referenceName": "ds_CopyToFinalSalesSqlDB",
+                        "type": "DatasetReference"
+                    },
+                    "name": "FinalSales"
+                }
+            ],
+            "transformations": [
+                {
+                    "name": "selectRequiredColumns"
+                },
+                {
+                    "name": "filterInvalidAmount"
+                },
+                {
+                    "name": "derivedDateColumn"
+                },
+                {
+                    "name": "RemoveDuplicateSalesID"
+                }
+            ],
+            "scriptLines": [
+                "source(output(",
+                "          CustomerID as integer,",
+                "          name as string,",
+                "          amount as decimal(10,2),",
+                "          SaleID as string,",
+                "          StoreID as integer,",
+                "          Quantity as integer,",
+                "          SaleDate as date,",
+                "          SaleTimestamp as timestamp,",
+                "          LoadTimestamp as timestamp,",
+                "          ProductID as integer",
+                "     ),",
+                "     allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     isolationLevel: 'READ_UNCOMMITTED',",
+                "     format: 'table') ~> StagingSales",
+                "StagingSales select(mapColumn(",
+                "          CustomerID,",
+                "          amount,",
+                "          SaleID,",
+                "          StoreID,",
+                "          Quantity,",
+                "          SaleDate,",
+                "          SaleTimestamp,",
+                "          LoadTimestamp,",
+                "          ProductID",
+                "     ),",
+                "     skipDuplicateMapInputs: true,",
+                "     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+                "selectRequiredColumns filter(amount>0 && Quantity>0) ~> filterInvalidAmount",
+                "filterInvalidAmount derive(SaleDate = toString(SaleDate, 'yyyy-MM-dd'),",
+                "          LoadTimestamp = currentUTC(),",
+                "          SaleTimestamp = toString(SaleTimestamp, 'yyyy-MM-dd HH:mm:ss')) ~> derivedDateColumn",
+                "derivedDateColumn aggregate(groupBy(SaleID,",
+                "          CustomerID,",
+                "          StoreID,",
+                "          Quantity,",
+                "          SaleDate,",
+                "          SaleTimestamp,",
+                "          LoadTimestamp,",
+                "          ProductID),",
+                "     amount = sum(amount)) ~> RemoveDuplicateSalesID",
+                "RemoveDuplicateSalesID sink(allowSchemaDrift: true,",
+                "     validateSchema: false,",
+                "     deletable:false,",
+                "     insertable:true,",
+                "     updateable:false,",
+                "     upsertable:false,",
+                "     format: 'table',",
+                "     skipDuplicateMapInputs: true,",
+                "     skipDuplicateMapOutputs: true,",
+                "     saveOrder: 1,",
+                "     errorHandlingOption: 'stopOnFirstError') ~> FinalSales"
+            ]
+        }
+    }
+}
