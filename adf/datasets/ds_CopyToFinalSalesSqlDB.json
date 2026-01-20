@@ -1,0 +1,17 @@
+{
+    "name": "ds_CopyToFinalSalesSqlDB",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "ds_FinalSalesSqlDB",
+            "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "AzureSqlTable",
+        "schema": [],
+        "typeProperties": {
+            "schema": "dbo",
+            "table": "final_sales"
+        }
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}
