@@ -11,13 +11,14 @@ The pipeline ingests sales CSV files from ADLS and loads them into a SQL staging
 
 **What I Built**
 1. Created Azure Services
-Azure Data Factory
-Azure Data Lake Gen2 with raw/sales container
-Azure SQL Database
-Staging table for Sales data
+-> Azure Data Factory
+-> Azure Data Lake Gen2 with raw/sales container
+-> Azure SQL Database
+    staging_sales table (raw ingestion)
+    final_sales table (transformed data)  
 
 2. Built ADF Pipeline
-Pipeline Name: pl_SalesDetails_Into_StagingTable
+**Pipeline1** Name: pl_SalesDetails_Into_StagingTable
 ✔ Copy Activity
 ✔ Source: CSV from ADLS
 ✔ Sink: Azure SQL (Staging table)
@@ -25,12 +26,28 @@ Pipeline Name: pl_SalesDetails_Into_StagingTable
 ✔ Recursive folder read enabled
 ✔ Successfully tested end to end
 
+**Pipeline2** Name: pl_ValidateAndIngestDataToFinalSalesTBL
+**DataFlow** Name : df_SalesTransform
+Transformations applied:
+✔ Column selection and renaming
+✔ Invalid amount filtering (Amount > 0)
+✔ Data type conversions:
+    SaleDate → To String
+    SaleTimestamp → To String
+✔ Load metadata (new column):
+    LoadTimestamp = currentUTC()
+✔ Duplicate handling
+✔ Load into final sales table
+
 **Next Steps / Enhancements (Planned)**
 
-Add Data Flow for filtering / mapping
-Add column count & schema validation
-Add row-count check
-Add audit logging table
-Add MERGE into final table
-Add file-processed archive folder
-Enable event-based trigger (file arrival trigger)
+[X] Add Data Flow for filtering / mapping
+[] Add column count & schema validation
+[] Add row-count check
+[] Add audit logging table
+[] Add MERGE into final table
+[] Add file-processed archive folder
+[] Enable event-based trigger (file arrival trigger)
+
+ **Screenshots**
+  Screenshots of pipeline execution, data flow, and SQL validation are available in the docs/folder 
